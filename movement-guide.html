@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movement Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<meta name="color-scheme" content="light only">
+<style>
+/* Force light mode rendering regardless of system preference */
+:root { color-scheme: light only; }
+/* ── LIGHT MODE (default) ── */
+:root {
+  --sage: #4a7a42;
+  --sage-light: #6a9e62;
+  --cream: #faf9f6;
+  --warm: #ede8e0;
+  --stone: #5a4e44;
+  --deep: #1e2218;
+  --mist: #a8c0a4;
+  --blush: #a07860;
+  --accent: #4a7a42;
+  --day: #8a6828;
+  --day-light: #d4bc88;
+  --eve: #4a7a42;
+  --eve-light: #a8c0a4;
+
+  /* semantic tokens */
+  --bg: #faf9f6;
+  --bg-glow-a: rgba(100,150,90,0.08);
+  --bg-glow-b: rgba(160,120,80,0.07);
+  --card-bg: #ffffff;
+  --card-border: rgba(100,90,80,0.18);
+  --body-text: #3a3e34;
+  --page-text: #2e3228;
+  --divider: var(--warm);
+  --toggle-track: var(--warm);
+  --theme-icon: "☀️";
+}
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --cream: #1e2220;
+  --warm: #2a2f2a;
+  --stone: #b0c4aa;
+  --deep: #e8f0e4;
+  --mist: #3a4a38;
+  --blush: #c4967a;
+  --sage: #8fb888;
+  --sage-light: #6a9464;
+  --day: #d4b06a;
+  --day-light: #3a3020;
+
+  --bg: #1e2220;
+  --bg-glow-a: rgba(100,140,95,0.10);
+  --bg-glow-b: rgba(140,110,80,0.08);
+  --card-bg: #262c24;
+  --card-border: rgba(100,120,90,0.22);
+  --body-text: #b8c8b2;
+  --page-text: #d0deca;
+  --divider: #2e3830;
+  --toggle-track: #2a2f2a;
+  --theme-icon: "🌙";
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: #f0ede6 !important;
+  color: var(--page-text);
+  min-height: 100vh;
+  font-weight: 300;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+[data-theme="dark"] body {
+  background: #1e2220 !important;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 80%, var(--bg-glow-a) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 10%, var(--bg-glow-b) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle {
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 100;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  color: var(--page-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.theme-toggle:hover {
+  border-color: var(--sage);
+  color: var(--sage);
+}
+.theme-toggle-icon { font-size: 14px; }
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 36px 20px 80px;
+}
+
+/* ── HEADER ── */
+header { text-align: center; margin-bottom: 32px; }
+.eyebrow {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--page-text); margin-bottom: 10px;
+}
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.1; color: var(--page-text);
+}
+h1 em { font-style: italic; color: var(--sage); }
+
+/* ── MODE TOGGLE ── */
+.mode-toggle {
+  display: flex;
+  background: var(--toggle-track);
+  border-radius: 40px;
+  padding: 4px;
+  width: fit-content;
+  margin: 24px auto 36px;
+  gap: 2px;
+}
+.mode-btn {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px; font-weight: 400;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 10px 22px; border-radius: 36px;
+  border: none; cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--page-text); background: transparent;
+}
+.mode-btn.active-day {
+  background: var(--day); color: white;
+  box-shadow: 0 2px 10px rgba(184,151,90,0.3);
+}
+.mode-btn.active-eve {
+  background: var(--sage); color: white;
+  box-shadow: 0 2px 10px rgba(125,155,118,0.3);
+}
+
+/* ── PANEL VISIBILITY ── */
+#day-panel, #eve-panel { display: none; }
+#day-panel.visible, #eve-panel.visible { display: block; }
+
+/* ═══════════════════════════════
+   DAY MODE
+═══════════════════════════════ */
+.day-intro {
+  background: rgba(184,151,90,0.08);
+  border: 1px solid rgba(184,151,90,0.25);
+  border-radius: 4px;
+  padding: 14px 18px;
+  font-size: 12.5px; line-height: 1.8; color: var(--deep);
+  margin-bottom: 28px;
+}
+.day-intro strong { color: var(--day); font-weight: 400; }
+
+.equip-label {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--page-text); margin-bottom: 12px;
+}
+.equip-grid {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;
+}
+.equip-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 12px 16px; border-radius: 6px;
+  border: 1.5px solid var(--warm); background: var(--card-bg);
+  cursor: pointer; transition: all 0.22s ease;
+  font-family: 'Jost', sans-serif;
+  min-width: 80px;
+}
+.equip-btn .eq-icon { font-size: 1.4rem; }
+.equip-btn .eq-label {
+  font-size: 10px; font-weight: 400; letter-spacing: 1px;
+  text-align: center; color: var(--deep); line-height: 1.3;
+}
+.equip-btn:hover { border-color: var(--day); }
+.equip-btn.selected {
+  border-color: var(--day); background: rgba(184,151,90,0.08);
+}
+.equip-btn.selected .eq-label { color: var(--day); }
+
+/* Snack circuit */
+.snack-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+}
+.snack-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-style: italic; color: var(--day);
+}
+.surprise-btn {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--day); background: transparent;
+  color: var(--day); cursor: pointer; transition: all 0.2s;
+}
+.surprise-btn:hover { background: var(--day); color: white; }
+
+.snack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+/* Day cards */
+.snack-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.snack-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--day); opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.snack-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.12); transform: translateY(-1px); }
+.snack-card:hover::before { opacity: 1; }
+
+.sc-number {
+  font-size: 10px; letter-spacing: 2px; color: var(--day);
+  font-weight: 400; margin-bottom: 6px;
+}
+.sc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 400;
+  color: var(--deep); margin-bottom: 7px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;
+}
+.sc-emoji { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+.sc-body {
+  font-size: 12px; font-weight: 300; line-height: 1.7;
+  color: var(--body-text); margin-bottom: 10px;
+}
+.sc-meta {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--stone); padding-top: 8px;
+  border-top: 1px solid var(--divider);
+}
+.sc-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.sc-tag {
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 10px;
+  background: rgba(184,151,90,0.1); color: var(--day);
+  border: 1px solid rgba(184,151,90,0.2);
+}
+
+.expand-btn {
+  background: none; border: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--day); cursor: pointer; margin-top: 8px;
+  padding: 0; text-decoration: underline; text-underline-offset: 3px;
+}
+.card-detail {
+  display: none; margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed var(--mist);
+  font-size: 12px; font-weight: 300; line-height: 1.8; color: var(--body-text);
+}
+.snack-card.expanded .card-detail { display: block; }
+
+.no-selection {
+  text-align: center; padding: 48px 20px;
+  color: var(--page-text); font-size: 13px; font-style: italic;
+}
+
+/* ═══════════════════════════════
+   EVENING MODE
+═══════════════════════════════ */
+.eve-intro {
+  background: rgba(125,155,118,0.08);
+  border: 1px solid rgba(125,155,118,0.25);
+  border-radius: 4px;
+  padding: 14px 18px;
+  font-size: 12.5px; line-height: 1.8; color: var(--deep);
+  margin-bottom: 28px;
+}
+.eve-intro strong { color: var(--sage); font-weight: 400; }
+
+.filter-label {
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--page-text); margin-bottom: 10px;
+}
+.filter-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.filter-btn {
+  border: 1px solid var(--mist); background: transparent;
+  color: var(--page-text); font-family: 'Jost', sans-serif;
+  font-size: 11px; font-weight: 300; letter-spacing: 1.5px;
+  padding: 6px 14px; border-radius: 20px;
+  cursor: pointer; transition: all 0.22s ease;
+}
+.filter-btn:hover { border-color: var(--sage); color: var(--sage); }
+.filter-btn.active { background: var(--sage); border-color: var(--sage); color: white; }
+
+.cat-btn {
+  border: 1px solid var(--warm); background: var(--warm);
+  color: var(--stone); font-family: 'Jost', sans-serif;
+  font-size: 10px; font-weight: 300; letter-spacing: 1.5px;
+  padding: 5px 12px; border-radius: 20px;
+  cursor: pointer; transition: all 0.22s ease;
+}
+.cat-btn:hover { border-color: var(--blush); color: var(--page-text); }
+.cat-btn.active { background: var(--blush); border-color: var(--blush); color: var(--page-text); }
+
+/* Evening snack strip */
+.eve-snack-strip {
+  background: rgba(125,155,118,0.06);
+  border: 1px solid rgba(125,155,118,0.2);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.eve-snack-label {
+  font-size: 11px; color: var(--sage); letter-spacing: 1.5px; text-transform: uppercase;
+}
+.eve-snack-strip button {
+  font-family: 'Jost', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--sage); background: transparent;
+  color: var(--sage); cursor: pointer; transition: all 0.2s;
+}
+.eve-snack-strip button:hover { background: var(--sage); color: white; }
+
+.results-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--divider);
+}
+.results-count { font-size: 11px; letter-spacing: 2px; color: var(--page-text); text-transform: uppercase; }
+.clear-btn {
+  font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--sage); background: none;
+  border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* Evening cards */
+.eve-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+.eve-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 4px; padding: 20px 22px;
+  position: relative; overflow: hidden;
+  transition: all 0.25s ease;
+}
+.eve-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--card-color, var(--sage));
+  opacity: 0.45; transition: opacity 0.2s;
+}
+.eve-card:hover { box-shadow: 0 5px 20px rgba(0,0,0,0.12); transform: translateY(-1px); }
+.eve-card:hover::before { opacity: 1; }
+.eve-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; margin-bottom: 8px; gap: 8px;
+}
+.eve-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 400; line-height: 1.2; color: var(--deep);
+}
+.eve-card-emoji { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+.eve-card-body {
+  font-size: 12px; font-weight: 300; line-height: 1.7;
+  color: var(--body-text); margin-bottom: 12px;
+}
+.eve-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.tag {
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 10px; font-weight: 400;
+}
+.tag-joint { background: rgba(125,155,118,0.15); color: var(--sage); border: 1px solid rgba(125,155,118,0.3); }
+.tag-cat { background: rgba(180,140,120,0.15); color: var(--blush); border: 1px solid rgba(180,140,120,0.3); }
+.tag-tool { background: rgba(140,130,120,0.15); color: var(--stone); border: 1px solid rgba(140,130,120,0.25); }
+.eve-card-sets {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--stone); padding-top: 8px; border-top: 1px solid var(--divider);
+}
+.eve-expand-btn {
+  background: none; border: none; font-family: 'Jost', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--sage); cursor: pointer; margin-top: 8px;
+  padding: 0; text-decoration: underline; text-underline-offset: 3px;
+}
+.eve-card-detail {
+  display: none; margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed var(--mist);
+  font-size: 12px; font-weight: 300; line-height: 1.8; color: var(--body-text);
+}
+.eve-card.expanded .eve-card-detail { display: block; }
+
+.empty-state { text-align: center; padding: 50px 20px; color: var(--stone); font-size: 13px; display: none; }
+.empty-state.visible { display: block; }
+
+/* Eve snack overlay cards */
+.eve-snack-results {
+  margin-bottom: 28px;
+  padding: 18px 0 22px;
+  border-bottom: 1px solid var(--divider);
+  display: none;
+}
+.eve-snack-results.visible { display: block; }
+.eve-snack-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-style: italic; color: var(--sage);
+  margin-bottom: 14px;
+}
+
+@media (max-width: 580px) {
+  .container { padding: 24px 14px 60px; }
+  .snack-grid, .eve-grid { grid-template-columns: 1fr; }
+  .equip-btn { min-width: 70px; padding: 10px 12px; }
+}
+
+/* Block system dark mode — theme is controlled manually only */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    background: var(--bg);
+    color: var(--page-text);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Theme toggle fixed outside container -->
+<button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark/light mode">
+  <span class="theme-toggle-icon" id="theme-icon">☀️</span>
+  <span id="theme-label">Light</span>
+</button>
+
+<div class="container">
+
+  <header>
+    <p class="eyebrow">Your Personal</p>
+    <h1>Movement <em>Guide</em></h1>
+  </header>
+
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle">
+    <button class="mode-btn" id="day-btn" onclick="setMode('day')">☀️ Day Snacks</button>
+    <button class="mode-btn" id="eve-btn" onclick="setMode('evening')">🌙 Evening</button>
+  </div>
+
+  <!-- ═══ DAY PANEL ═══ -->
+  <div id="day-panel">
+    <div class="day-intro">
+      <strong>Workout snacks</strong> — pick the equipment nearby and get a 4–5 move circuit. No setup, no sequence to remember. Tap "Surprise me" for a random circuit from any equipment.
+    </div>
+
+    <div class="equip-label">What's nearby?</div>
+    <div class="equip-grid" id="equip-grid">
+      <button class="equip-btn" data-equip="trampoline" onclick="selectEquip(this)">
+        <span class="eq-icon">🪃</span>
+        <span class="eq-label">Mini Trampoline</span>
+      </button>
+      <button class="equip-btn" data-equip="dumbbells" onclick="selectEquip(this)">
+        <span class="eq-icon">🏋️</span>
+        <span class="eq-label">Light Dumbbells</span>
+      </button>
+      <button class="equip-btn" data-equip="step" onclick="selectEquip(this)">
+        <span class="eq-icon">📦</span>
+        <span class="eq-label">Exercise Step</span>
+      </button>
+      <button class="equip-btn" data-equip="body" onclick="selectEquip(this)">
+        <span class="eq-icon">🧍</span>
+        <span class="eq-label">Just My Body</span>
+      </button>
+      <button class="equip-btn" data-equip="walls" onclick="selectEquip(this)">
+        <span class="eq-icon">🪑</span>
+        <span class="eq-label">Walls + Chairs</span>
+      </button>
+      <button class="equip-btn" data-equip="roller" onclick="selectEquip(this)">
+        <span class="eq-icon">🪵</span>
+        <span class="eq-label">Foam Roller</span>
+      </button>
+      <button class="equip-btn" data-equip="loops" onclick="selectEquip(this)">
+        <span class="eq-icon">🔁</span>
+        <span class="eq-label">Loops / Straps</span>
+      </button>
+    </div>
+
+    <div id="day-results">
+      <div class="no-selection" id="day-placeholder">
+        Tap a piece of equipment above to generate your snack circuit.
+      </div>
+      <div id="snack-circuit" style="display:none">
+        <div class="snack-header">
+          <div class="snack-title" id="snack-circuit-title">Your circuit</div>
+          <button class="surprise-btn" onclick="surpriseMe()">✦ Surprise me</button>
+        </div>
+        <div class="snack-grid" id="snack-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EVENING PANEL ═══ -->
+  <div id="eve-panel">
+    <div class="eve-intro">
+      <strong>Evening practice</strong> — filter by body part or intention and browse at your pace. Or tap "Give me a circuit" for a curated 4–5 move evening snack set.
+    </div>
+
+    <!-- Evening snack strip -->
+    <div class="eve-snack-strip">
+      <span class="eve-snack-label">✦ Want a quick circuit instead of browsing?</span>
+      <button onclick="eveningSnack()">Give me a circuit</button>
+    </div>
+
+    <!-- Evening snack results (shown above browse) -->
+    <div class="eve-snack-results" id="eve-snack-results">
+      <div class="eve-snack-heading" id="eve-snack-heading">Your evening circuit</div>
+      <div class="snack-grid" id="eve-snack-grid"></div>
+      <button class="surprise-btn" style="margin-top:10px; border-color:var(--sage); color:var(--sage);" onclick="eveningSnack()">↻ Different circuit</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-label">Filter by joint / area</div>
+    <div class="filter-row" id="joint-filters">
+      <button class="filter-btn active" data-value="all" onclick="setJoint(this)">All</button>
+      <button class="filter-btn" data-value="ankles" onclick="setJoint(this)">Ankles</button>
+      <button class="filter-btn" data-value="wrists" onclick="setJoint(this)">Wrists</button>
+      <button class="filter-btn" data-value="shoulders" onclick="setJoint(this)">Shoulders</button>
+      <button class="filter-btn" data-value="knees" onclick="setJoint(this)">Knees</button>
+      <button class="filter-btn" data-value="hips" onclick="setJoint(this)">Hips</button>
+      <button class="filter-btn" data-value="legs" onclick="setJoint(this)">Legs</button>
+      <button class="filter-btn" data-value="core" onclick="setJoint(this)">Core</button>
+    </div>
+    <div class="filter-label" style="margin-top:14px">Filter by intention</div>
+    <div class="filter-row" id="cat-filters">
+      <button class="cat-btn active" data-value="all" onclick="setCat(this)">All</button>
+      <button class="cat-btn" data-value="lymphatic" onclick="setCat(this)">Lymphatic</button>
+      <button class="cat-btn" data-value="flossing" onclick="setCat(this)">Body Flossing</button>
+      <button class="cat-btn" data-value="mobility" onclick="setCat(this)">Hip Mobility</button>
+      <button class="cat-btn" data-value="mindfulness" onclick="setCat(this)">Mindfulness</button>
+      <button class="cat-btn" data-value="strengthen" onclick="setCat(this)">Strengthen</button>
+    </div>
+    <div class="filter-label" style="margin-top:14px">Filter by location</div>
+    <div class="filter-row" id="couch-filters">
+      <button class="cat-btn active" data-value="all" onclick="setCouchFilter(this)">All</button>
+      <button class="cat-btn" data-value="couch" onclick="setCouchFilter(this)">🛋️ Couch Only</button>
+    </div>
+
+    <div class="results-bar" style="margin-top:22px">
+      <span class="results-count" id="results-count">— movements</span>
+      <button class="clear-btn" onclick="clearFilters()">Clear filters</button>
+    </div>
+
+    <div class="eve-grid" id="eve-grid"></div>
+    <div class="empty-state" id="empty-state">No movements match this combination. Try clearing a filter.</div>
+  </div>
+
+</div>
+
+<script>
+// ═══ THEME ══════════════════════════════════════════════════
+(function() {
+  const saved = localStorage.getItem('mg-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  if (label) label.textContent = theme === 'dark' ? 'Dark' : 'Light';
+  localStorage.setItem('mg-theme', theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// ═══ DATA ═══════════════════════════════════════════════════
+
+const dayMovements = {
+  trampoline: [
+    { title:"Health Bounce", emoji:"🪃", body:"Stand and gently spring — feet barely leave the surface. The G-force change pumps the entire lymphatic system from ankles to neck.", detail:"3–5 minutes continuous. NASA research identified rebounding as one of the most efficient exercises for lymphatic circulation.", joints:["ankles","knees","hips","legs"], sets:"3–5 mins continuous" },
+    { title:"Single-Leg Balance Hold", emoji:"🦾", body:"Stand on one foot on the trampoline. The unstable surface fires every ankle, knee, and hip stabilizer reflexively.", detail:"30–45 seconds each side. Close your eyes for 10 seconds once comfortable — removes visual feedback and dramatically increases the stability demand.", joints:["ankles","knees","hips","legs"], sets:"30–45s each side" },
+    { title:"Trampoline Arm Swings", emoji:"🙌", body:"While bouncing gently, swing arms forward and back, then out to sides. Drains axillary lymph nodes — the largest chain in the upper body.", detail:"Keep bounce very gentle. 2–3 minutes. The arm motion drives lymph through the axillary chain while the bounce pumps the lower body.", joints:["shoulders","ankles","legs"], sets:"2–3 mins" },
+    { title:"Hip Circle Bounce", emoji:"🌀", body:"While bouncing lightly, add slow hip circles. Combines the lymphatic pump of rebounding with active hip joint mobility.", detail:"5 circles each direction. Keep bounce very gentle — focus on the hip rotation, not height.", joints:["hips","ankles","legs"], sets:"5 each direction" },
+    { title:"Heel-to-Toe Rocking", emoji:"👟", body:"Standing still on the trampoline, slowly rock from heels to toes and back. Wakes up full ankle range and lower leg muscles.", detail:"10 slow rocks. The soft surface makes every balance correction a small strengthening event for the ankle and calf.", joints:["ankles","knees","legs"], sets:"10 slow rocks · 2 rounds" },
+    { title:"March in Place Bounce", emoji:"🚶", body:"Gently alternate lifting knees while bouncing. Adds hip flexor activation and thigh lymph pumping to the basic bounce.", detail:"20 alternating knee lifts. Keep the bounce minimal. Hip flexors work eccentrically — joint-friendly and effective.", joints:["hips","knees","legs","core"], sets:"20 alternating · 2 rounds" },
+    { title:"Seated Edge Bounce", emoji:"💺", body:"Sit on the edge of the trampoline frame and bounce lightly. Passive lymphatic pump through the lower body with no standing required.", detail:"2–3 minutes. The bounce still generates G-force changes that move lymph — great entry point if standing feels like too much.", joints:["hips","knees","legs"], sets:"2–3 mins" }
+  ],
+  dumbbells: [
+    { title:"Wrist Curl + Reverse Curl", emoji:"💪", body:"Seated, forearm on thigh. Curl the wrist up, lower slowly. Flip palm down — reverse curl. Strengthens wrist flexors and extensors directly.", detail:"8–10 each direction each arm. The eccentric (lowering) phase is where most strengthening happens.", joints:["wrists"], sets:"8–10 each direction · each arm" },
+    { title:"Lateral Shoulder Raise — Half Range", emoji:"↕️", body:"Stand holding light dumbbells. Raise arms to 90° and lower slowly. Half-range is fine — the goal is rotator cuff loading.", detail:"8–10 reps. Keep a slight bend in elbows. Going above shoulder height shifts load from rotator cuff to traps — stay at 90°.", joints:["shoulders"], sets:"8–10 reps · 1–2 sets" },
+    { title:"Goblet Squat Hold", emoji:"🏋️", body:"Hold one dumbbell at chest, feet hip-width. Lower into a squat and hold 3–5 seconds at the bottom before rising.", detail:"5–8 reps. The pause at the bottom is the training stimulus — hip rotators, knee stabilizers, ankle dorsiflexors, and deep core are all working.", joints:["hips","knees","ankles","legs","core"], sets:"5–8 reps · slow hold" },
+    { title:"Farmer Carry", emoji:"🚶", body:"Hold a dumbbell in each hand and walk a slow deliberate lap. Loaded grip, shoulder stability, and single-leg moments with every step.", detail:"1–2 slow laps. Farmer carries are among the highest-value functional exercises — grip, wrists, shoulders, trunk, and gait all in one.", joints:["wrists","shoulders","hips","ankles","legs","core"], sets:"1–2 laps · slow" },
+    { title:"Seated Hip Abduction with Weight", emoji:"🦵", body:"Seated, place one dumbbell on the outer thigh just above the knee. Press the knee outward. Gluteus medius strengthening without standing.", detail:"10–12 reps each side. Glute med is the primary stabilizer of the hip and knee during walking.", joints:["hips","knees","legs"], sets:"10–12 each side" },
+    { title:"Romanian Deadlift", emoji:"🏹", body:"Hold dumbbells in front of thighs. Hinge at hips with a soft knee, lower weights down your legs, return. Hamstrings, glutes, and posterior chain.", detail:"8–10 reps. Keep the spine long throughout. This is the foundational pattern for all safe bending — trains the body to load the hips rather than the spine.", joints:["hips","knees","legs","core"], sets:"8–10 reps · controlled" },
+    { title:"Dumbbell Core Press-Out", emoji:"🎯", body:"Seated or standing, hold one dumbbell at chest. Slowly press it straight out and pull back. Core must resist the load shifting forward.", detail:"8–10 reps slow. Anti-flexion core training — the deep stabilizers work to protect the spine from forward load, exactly what they do all day.", joints:["shoulders","core"], sets:"8–10 reps · slow" },
+    { title:"Curl to Press", emoji:"🔄", body:"Hold light dumbbells, curl to shoulders, then press overhead. Two joints in sequence with controlled deceleration on the way down.", detail:"8 reps. Lower slowly — 3–4 counts. The eccentric phase rebuilds tendon integrity at both the bicep and shoulder.", joints:["shoulders","wrists"], sets:"8 reps · slow lower" }
+  ],
+  step: [
+    { title:"Eccentric Heel Lower", emoji:"⬇️", body:"Stand on step edge, rise onto toes, then lower heel slowly below step level. The eccentric lowering is the therapeutic key for Achilles and calf health.", detail:"10–15 reps. Lower takes 3–4 seconds. Clinical protocol for Achilles tendinopathy — eccentric load remodels tendon tissue.", joints:["ankles","knees","legs"], sets:"10–15 slow reps · 2 sets" },
+    { title:"Step-Up with Pause", emoji:"🪜", body:"Step up with one foot, bring the other to meet it, pause 2 seconds, step down slowly. Single-leg loading for hip, knee, and ankle stability.", detail:"8 reps each lead foot. The pause trains glute med, VMO, and ankle stabilizers simultaneously. Step down as slowly as possible.", joints:["hips","knees","ankles","legs"], sets:"8 each side · controlled" },
+    { title:"Lateral Step Touch", emoji:"↔️", body:"Stand beside step, tap one foot to the surface and return. The standing leg does all the work — hip abductors, knee stabilizers, ankle.", detail:"10 reps each side. Slow: 3 seconds up, 3 down. Add a loop above knees for extra glute med demand.", joints:["hips","knees","ankles","legs"], sets:"10 each side" },
+    { title:"Step Hip Hinge", emoji:"🏹", body:"Stand on step, hinge forward at hips with a soft knee, reach toward the floor, return upright. Foundational hip hinge pattern.", detail:"8–10 reps. Keep the spine long — not rounded. Trains the posterior chain to control the pelvis during bending.", joints:["hips","knees","legs","core"], sets:"8–10 reps" },
+    { title:"Calf Pulse Sequence", emoji:"🔼", body:"10 full heel raises, then 10 half-range pulses at the top, then hold 10 seconds. Progressive fatigue for ankle and calf strength.", detail:"One set each side. Hits slow and fast twitch fibers. The isometric hold is especially effective for joint stability.", joints:["ankles","knees","legs"], sets:"Full sequence each leg" },
+    { title:"Step Core Lean", emoji:"🌲", body:"Stand on step. Slowly lean forward from the ankle until calf and ankle engage, return upright. Anterior tibialis and core co-activation.", detail:"8–10 reps. Anti-gravity drill — core and ankle work together to control forward body lean. Used in gait rehab.", joints:["ankles","legs","core"], sets:"8–10 reps · slow" },
+    { title:"Step Glute Bridge", emoji:"🌉", body:"Lie on floor, feet on top of the step. Press through heels to lift hips toward ceiling. Hold 3 seconds at the top. Elevated foot position shifts load toward hamstrings.", detail:"10–12 reps. The elevation increases hip extension range compared to a flat bridge.", joints:["hips","knees","legs","core"], sets:"10–12 reps · 3s hold" }
+  ],
+  body: [
+    { title:"Deep Squat Hold", emoji:"🧎", body:"Feet shoulder-width, toes slightly out. Lower into a deep squat and hold using a doorframe for balance if needed.", detail:"Work up to 2 minutes. Connective tissue remodels in this position. Opens hips, ankles, and knees simultaneously.", joints:["hips","knees","ankles","legs"], sets:"30s–2 mins · breathe" },
+    { title:"90-90 Hip Switches", emoji:"🔄", body:"Sit with both knees bent at 90°, one in front, one to the side. Rotate to switch. Hip internal and external rotation in one flow.", detail:"5 switches each direction. Gold-standard hip mobility drill — specifically targets internal rotation, the range most people lack.", joints:["hips","knees","legs"], sets:"5 each direction · slow" },
+    { title:"Wall Sit", emoji:"🧱", body:"Back flat against wall, slide down to 90°. Isometric quad and glute loading with zero impact.", detail:"30–60 seconds. Trains VMO (inner quad) — the primary dynamic knee stabilizer. Progress by adding one heel raise at a time.", joints:["knees","hips","legs"], sets:"30–60s · 1–2 holds" },
+    { title:"Prone Hip Extension", emoji:"⬆️", body:"Lie face down, arms at sides. Squeeze one glute and lift the leg a few inches. Hold 3s, lower. Isolates the glute without spinal load.", detail:"10 reps each side. The squeeze before lifting is what activates the glute — not the height of the leg.", joints:["hips","legs"], sets:"10 each side · slow" },
+    { title:"Shoulder CARS", emoji:"⭕", body:"Controlled Articular Rotation — slowly rotate one arm through its absolute full range in every direction. Active joint health drill.", detail:"3 full rotations each arm each direction. Used in functional range conditioning to maintain and expand joint capsule health.", joints:["shoulders"], sets:"3 each direction · each arm" },
+    { title:"Dead Bug", emoji:"🐞", body:"Lie on back, arms up toward ceiling, knees bent at 90° in the air. Slowly lower one arm and the opposite leg toward the floor, return.", detail:"6–8 reps each side. Keep your low back pressed to the floor throughout. Foundational deep core exercise — trains anti-extension.", joints:["core","hips","legs"], sets:"6–8 each side · slow" },
+    { title:"Bird Dog", emoji:"🐦", body:"On hands and knees, extend one arm and the opposite leg simultaneously. Hold 3 seconds. Core stability and hip extension together.", detail:"8 reps each side. The goal is a still torso — arm and leg move but nothing else does. Trains multifidus and transverse abdominis together.", joints:["core","hips","shoulders","legs"], sets:"8 each side · 3s hold" },
+    { title:"Glute Bridge", emoji:"🌉", body:"Lie on back, knees bent, feet flat. Press through heels to lift hips to a straight line from knees to shoulders. Hold 2–3 seconds at top.", detail:"10–12 reps. Squeeze the glutes at the top. Trains glute for hip extension — what it does with every step you take.", joints:["hips","knees","legs","core"], sets:"10–12 reps · 2–3s hold" },
+    { title:"Standing Hip CARS", emoji:"🦵", body:"Stand near a wall. Slowly rotate one hip through its full range — lift the knee, rotate the leg out, extend back, return.", detail:"3 full circles each direction each leg. Maintains the full range of the hip capsule and reduces joint stiffness.", joints:["hips","legs","core"], sets:"3 each direction · each leg" }
+  ],
+  walls: [
+    { title:"Wall Sit", emoji:"🧱", body:"Back flat against wall, slide down to 90°. Isometric quad and VMO loading — the primary dynamic knee stabilizer.", detail:"30–60 seconds. Progress by lifting one heel at a time while holding.", joints:["knees","hips","legs"], sets:"30–60s · 1–2 holds" },
+    { title:"Chair Sit-to-Stand — Slow", emoji:"🪑", body:"From a chair, rise as slowly as possible (5 counts up, 5 counts down). The most functional lower body strength exercise for daily life.", detail:"8–10 reps. Avoid using hands unless needed. Directly trains fall prevention.", joints:["hips","knees","ankles","legs"], sets:"8–10 reps · 5-count each way" },
+    { title:"Wall Angels", emoji:"🪽", body:"Back flat against wall, arms at 90°. Slowly slide arms up overhead like a snow angel, keeping contact with wall throughout.", detail:"8–10 slow reps. Only go as high as you can while maintaining wall contact. The wall gives feedback when you compensate.", joints:["shoulders","wrists"], sets:"8–10 reps · 1–2 sets" },
+    { title:"Stair Calf Raises", emoji:"🪜", body:"Stand on the bottom stair edge, rise onto toes and lower heel slowly below stair level. Eccentric Achilles and calf tendon loading.", detail:"10–15 reps. Lower heel for 3–4 seconds. Hold railing throughout. The exact protocol used in Achilles tendon rehab.", joints:["ankles","knees","legs"], sets:"10–15 reps · 2 sets" },
+    { title:"Doorframe Shoulder Stretch + Squeeze", emoji:"🚪", body:"Stand in a doorframe, hand on frame at shoulder height. Rotate body away to feel the chest stretch. Then squeeze the shoulder blade back.", detail:"Hold stretch 20s, then 5 squeeze-and-release reps. Restores the full shoulder movement cycle.", joints:["shoulders"], sets:"Each side · 2 rounds" },
+    { title:"Wall Core Press", emoji:"🧲", body:"Stand arms-length from a wall, hands flat at chest height. Lean in and press back. Core stabilizes the trunk against the shifting load.", detail:"8–10 reps. Standing push exercise — the core anti-rotation demand is what makes it valuable. Move slowly and feel the mid-section engage.", joints:["shoulders","core"], sets:"8–10 reps" },
+    { title:"Stair Hip Hinge", emoji:"🏠", body:"Stand on the bottom stair, hinge forward from the hip with a soft knee and reach toward the step below. Return upright.", detail:"8 reps. Hold railing lightly. The stair elevation increases hip range compared to floor-level hinges.", joints:["hips","legs","core"], sets:"8 reps" },
+    { title:"Single-Leg Stand with Chair", emoji:"🦩", body:"Stand beside a chair, fingertips touching it lightly. Lift one foot and hold. Gradually reduce hand pressure — true balance uses hip stabilizers.", detail:"30–45 seconds each side. Progress by reducing hand contact week by week until you're hovering a finger.", joints:["ankles","knees","hips","legs","core"], sets:"30–45s each side" }
+  ],
+  roller: [
+    { title:"Thoracic Extension", emoji:"🌅", body:"Roller across mid-back. Support head with hands. Let chest open toward ceiling. The most effective single reset for rounded shoulders.", detail:"Move up 1–2 inches at a time, mid to upper back. 2–3 minutes. Mobilizes the thoracic spine, which governs shoulder movement quality.", joints:["shoulders"], sets:"2–3 mins · slow segments" },
+    { title:"IT Band + Quad Roll", emoji:"🦵", body:"Roller under one thigh. Roll slowly from hip to just above knee. Fascial release for outer thigh, quadriceps, and IT band.", detail:"1–2 minutes per leg. Pause on dense spots and breathe 3–5 times before moving. One inch per breath.", joints:["hips","knees","legs"], sets:"1–2 mins each leg" },
+    { title:"Forearm Roll", emoji:"🤲", body:"Rest one forearm on roller on a table. Use other hand to press gently. Roll from wrist to elbow — both palm-side and top-side.", detail:"1–2 minutes each arm. Forearm fascial tightness directly contributes to wrist and elbow tension.", joints:["wrists"], sets:"1–2 mins each arm" },
+    { title:"Calf Roll", emoji:"🦶", body:"Seated on floor, roller under calves. Use hands to lift hips slightly and roll from Achilles toward the back of the knee.", detail:"30–45 seconds each calf. Cross one ankle over the other to increase pressure. Calf tightness directly restricts ankle dorsiflexion.", joints:["ankles","knees","legs"], sets:"30–45s each calf" },
+    { title:"Hip Flexor + TFL Roll", emoji:"🌿", body:"Lie face down, roller at the front of one hip and upper thigh. Roll the hip flexor and TFL — just in front of and below the hip bone.", detail:"30–60 seconds each side. This area is often densely compressed from sitting. Release here improves hip extension and reduces anterior knee pull.", joints:["hips","knees","legs"], sets:"30–60s each side" },
+    { title:"Hamstring Roll", emoji:"🌊", body:"Seated on floor, roller under one thigh behind the knee. Use arms to shift and roll from knee toward the glute. Releases the posterior chain.", detail:"1–2 minutes each leg. Cross the opposite ankle over to increase pressure. Hamstring tightness tilts the pelvis and compresses the lower back.", joints:["hips","knees","legs"], sets:"1–2 mins each leg" },
+    { title:"Glute Roll", emoji:"💺", body:"Sit on the roller, one ankle crossed over the opposite knee. Lean toward the crossed-leg side and roll the glute of that side.", detail:"30–60 seconds each side. The piriformis is deep in the glute and often tight — a primary contributor to hip and low back pain.", joints:["hips","legs"], sets:"30–60s each side" },
+    { title:"Lat Roll", emoji:"🎯", body:"Lie on your side, roller under your armpit at the side of the ribcage. Roll from armpit down toward the waist.", detail:"30–60 seconds each side. Lat tightness directly restricts shoulder overhead range — release here and shoulder mobility often improves immediately.", joints:["shoulders","core"], sets:"30–60s each side" }
+  ],
+  loops: [
+    { title:"Clamshells", emoji:"🦪", body:"Loop above knees. Lie on side or sit at couch edge. Open the top knee against the resistance. Gluteus medius — hip and knee's primary stabilizer.", detail:"12–15 reps each side. Keep pelvis still. Even small range is effective. One of the most universally prescribed exercises in physical therapy.", joints:["hips","knees","legs"], sets:"12–15 each side · 1–2 sets" },
+    { title:"Seated Hip Abduction", emoji:"↔️", body:"Loop above knees. Seated, press knees apart against the loop and slowly return. Gluteus medius work without leaving your seat.", detail:"12–15 reps. Hold the widest position for 2 seconds on each rep.", joints:["hips","knees","legs"], sets:"12–15 reps · 1–2 sets" },
+    { title:"Loop Ankle Circles", emoji:"🔁", body:"Loop around ball of foot. Hold the ends. Slowly resist your own ankle circles with gentle tension.", detail:"8 circles each direction each foot. Anchor one end under your thigh to free both hands.", joints:["ankles","legs"], sets:"8 each direction · both feet" },
+    { title:"Standing Hip Extension", emoji:"🏹", body:"Loop above ankles, stand near wall. Kick one leg straight back against the loop. Loads the glute for functional hip extension.", detail:"10–12 reps each side. Keep the lower back still — only the hip moves.", joints:["hips","ankles","legs"], sets:"10–12 each side" },
+    { title:"Loop Shoulder Press-Out", emoji:"💪", body:"Hold loop with both hands at chest width. Slowly press hands apart, then return. Activates rotator cuff and scapular stabilizers.", detail:"8–10 reps. Vary the height — chest, overhead, and below waist. Each angle targets a different rotator cuff plane.", joints:["shoulders","wrists"], sets:"8–10 reps · 3 heights" },
+    { title:"Loop Lateral Walk", emoji:"🦀", body:"Loop just above both knees. Feet shoulder-width, slight squat. Step sideways 10 steps one direction, then back. Hip abductor endurance and knee alignment.", detail:"2–3 lengths each direction. Keep toes forward and maintain the squat position throughout.", joints:["hips","knees","ankles","legs"], sets:"2–3 lengths each direction" },
+    { title:"Terminal Knee Extension", emoji:"🦵", body:"Loop anchored at knee height, loop around one knee. Stand with soft knee, press forward against the loop to fully straighten. VMO and knee stabilizer.", detail:"12–15 reps each side. Trains the last 15° of knee extension — the range most important for locking the knee safely in walking.", joints:["knees","legs"], sets:"12–15 each side" },
+    { title:"Loop Core Pallof Press", emoji:"🧲", body:"Anchor loop at chest height on a door or furniture. Stand sideways, hold loop at chest, press straight out and return. Anti-rotation core strength.", detail:"8–10 reps each side. The farther you stand from the anchor, the harder. Trains obliques and deep core to resist rotation.", joints:["core","shoulders"], sets:"8–10 each side" }
+  ]
+};
+
+const eveningMovements = [
+  // ── COUCH · ANKLES ──────────────────────────────────────────
+  { title:"Ankle Alphabet", emoji:"🦶", body:"Lift one foot and trace every letter with your toes. Full slow circles in every direction — the most complete ankle range-of-motion exercise there is.", detail:"A–Z on one foot, rest, repeat the other. Standard post-injury rehab drill used to restore full directional range.", joints:["ankles","legs"], cats:["lymphatic","strengthen"], couch:true, tools:[], sets:"1 round each foot", color:"#9ab89a" },
+  { title:"Seated Ankle Pumps", emoji:"💧", body:"Feet flat or elevated. Pump ankles rhythmically up and down — flex and point. The calf-pump action moves lymph and venous blood upward from the lower legs.", detail:"30–60 pumps. Recommended after long flights to prevent lower leg swelling. Do anytime your feet feel heavy or puffy.", joints:["ankles","legs"], cats:["lymphatic"], couch:true, tools:[], sets:"30–60 pumps", color:"#9ab89a" },
+  { title:"Foot Dome Lifts", emoji:"🌿", body:"Feet flat on the floor. Press the ball of your foot down and dome the arch upward without curling your toes. Hold 3s, release. Strengthens intrinsic foot muscles.", detail:"8–10 reps each foot. These small muscles support every step and are almost never directly trained.", joints:["ankles","legs"], cats:["strengthen"], couch:true, tools:[], sets:"8–10 each foot", color:"#9ab89a" },
+  { title:"Loop Ankle Circles", emoji:"🔁", body:"Loop around ball of foot. Hold the ends. Slowly resist your own ankle circles with gentle tension. Proprioception and ankle stability work simultaneously.", detail:"8 circles each direction each foot. Anchor one end under your thigh to free both hands.", joints:["ankles","legs"], cats:["strengthen","lymphatic"], couch:true, tools:["resistance loops"], sets:"8 each direction · both feet", color:"#9ab89a" },
+  { title:"Seated Ankle Inversion/Eversion", emoji:"↩️", body:"Seated, loop around the ball of one foot, anchor the other end under your thigh. Tilt the foot inward (inversion) then outward (eversion) against resistance.", detail:"10 reps each direction each foot. These are the two most commonly injured ankle movements — direct strengthening here builds injury resilience.", joints:["ankles","legs"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"10 each direction · both feet", color:"#9ab89a" },
+
+  // ── COUCH · WRISTS ──────────────────────────────────────────
+  { title:"Wrist Circles & Prayer Stretch", emoji:"🙏", body:"Slow wrist circles in both directions, then palms pressed together, gently tilt side to side. Supports lymph flow through the forearm.", detail:"10 circles each direction, each wrist. Prayer stretch: elbows at 90°, tilt joined hands toward each wrist, hold 3s, 5 reps.", joints:["wrists"], cats:["lymphatic","flossing"], couch:true, tools:[], sets:"2–3 mins", color:"#c4a898" },
+  { title:"Wrist Nerve Glides", emoji:"✋", body:"Arm extended to your side, palm up. Slowly flex and extend the wrist while keeping the arm still. Flosses the median nerve through the carpal tunnel.", detail:"5–10 slow flexions with arm at shoulder height. Tilt your head away from the extended arm for a stronger nerve floss sensation.", joints:["wrists","shoulders"], cats:["flossing","lymphatic"], couch:true, tools:[], sets:"5–10 each arm", color:"#c4a898" },
+  { title:"Strap Wrist Pulls", emoji:"🎀", body:"Loop strap around both wrists. Gently pull hands apart while each wrist resists the other. Vary angles — in front, one high one low, overhead.", detail:"5–8 reps each angle. Isometric wrist loading at multiple angles strengthens the small joint stabilizers. Used in climbing and gymnastics rehab.", joints:["wrists","shoulders"], cats:["strengthen","flossing"], couch:true, tools:["resistance straps"], sets:"5–8 per angle · 3 angles", color:"#c4a898" },
+  { title:"Forearm Roller on Couch Arm", emoji:"🤲", body:"Rest one forearm on the foam roller placed on the couch arm or a firm surface. Use the other hand to press and roll gently from wrist to elbow.", detail:"1–2 minutes each arm. Forearm fascial tightness directly contributes to wrist and elbow pain — especially after screen time.", joints:["wrists"], cats:["flossing","lymphatic"], couch:true, tools:["foam roller"], sets:"1–2 mins each arm", color:"#c4a898" },
+
+  // ── COUCH · SHOULDERS ───────────────────────────────────────
+  { title:"Shoulder Blade Squeezes", emoji:"🌾", body:"Draw shoulder blades toward each other and slightly down. Hold 3–5 seconds. Counteracts couch slump and activates mid-back stabilizers.", detail:"10–12 reps. Think of holding a small orange between your shoulder blades. Keep the chin neutral.", joints:["shoulders"], cats:["strengthen","mindfulness"], couch:true, tools:[], sets:"10–12 reps", color:"#a8b8c8" },
+  { title:"Neck Half-Moons", emoji:"🌙", body:"Slowly arc your chin from one shoulder to the other through the chest — never roll the head backward. Drains the cervical lymph nodes along the neck and jaw.", detail:"3–5 slow passes. Exhale as the chin drops toward the chest. Keep shoulders dropped throughout.", joints:["shoulders"], cats:["lymphatic","mindfulness"], couch:true, tools:[], sets:"3–5 slow passes", color:"#a8b8c8" },
+  { title:"Thoracic Rotation Seated", emoji:"🌀", body:"Seated upright, arms crossed over chest. Slowly rotate the ribcage left, then right. Mobilizes the thoracic spine — the foundation of shoulder and hip health.", detail:"5–8 rotations each direction. Keep the pelvis still — only the ribcage rotates. This motion is restricted in most people who sit a lot.", joints:["shoulders","hips","core"], cats:["mobility","flossing"], couch:true, tools:[], sets:"5–8 each direction", color:"#a8b8c8" },
+  { title:"Loop Shoulder Press-Out", emoji:"💪", body:"Hold loop at chest width. Slowly press hands apart, return. Activates the rotator cuff and scapular stabilizers with zero joint load.", detail:"8–10 reps. 3 seconds out, 3 seconds back. Vary the height — chest, overhead, below waist.", joints:["shoulders","wrists"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"8–10 reps · 3 heights", color:"#a8b8c8" },
+  { title:"Seated Row with Strap", emoji:"🎗️", body:"Loop strap around both feet or a couch leg. Hold both ends and slowly pull elbows back, squeezing shoulder blades together.", detail:"10–12 reps. Hold the squeeze for 2 seconds. Mid-back muscles are almost always under-activated relative to the chest.", joints:["shoulders","wrists","core"], cats:["strengthen"], couch:true, tools:["resistance straps"], sets:"10–12 reps", color:"#a8b8c8" },
+  { title:"Shoulder CARS — Seated", emoji:"⭕", body:"Seated, slowly rotate one arm through its absolute full range — reaching forward, up, back, down. Active joint health drill for the full shoulder capsule.", detail:"3 full rotations each arm each direction. Move as slowly as you can. Used in functional range conditioning to maintain joint health.", joints:["shoulders"], cats:["mobility","flossing"], couch:true, tools:[], sets:"3 each direction · each arm", color:"#a8b8c8" },
+
+  // ── COUCH · HIPS ────────────────────────────────────────────
+  { title:"Seated Figure-4", emoji:"🪷", body:"Cross one ankle over the opposite knee. Gently press the raised knee toward the floor. Breathe into the hip. Hold, switch sides.", detail:"30–60 seconds each side. Lean forward with a long spine for a deeper stretch into the piriformis and external hip rotators.", joints:["hips","knees"], cats:["mobility","mindfulness"], couch:true, tools:[], sets:"30–60s each side", color:"#b8a8d0" },
+  { title:"Seated Hip Rolls", emoji:"🌀", body:"Sit at the couch edge. Slowly circle your pelvis — forward, side, back, side. Warms the hip joints, sacrum, and lower back.", detail:"5 circles each direction. Isolate the pelvis — keep the ribcage mostly still. Used in sacroiliac joint rehab.", joints:["hips","core"], cats:["mobility","lymphatic"], couch:true, tools:[], sets:"5 each direction", color:"#b8a8d0" },
+  { title:"Seated Hip Abduction", emoji:"↔️", body:"Loop just above both knees. Press knees apart against the resistance, hold 2s at the widest point, slowly return.", detail:"12–15 reps. Spine tall throughout. Can be done continuously while watching TV.", joints:["hips","knees","legs"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"12–15 reps · 1–2 sets", color:"#b8a8d0" },
+  { title:"Clamshells on Couch", emoji:"🦪", body:"Lie on your side along the couch, loop above both knees. Open the top knee toward the ceiling. Keep your pelvis still.", detail:"12–15 reps each side. Even a few inches of opening is effective. Glute med weakness is a root cause of both hip and knee pain.", joints:["hips","knees","legs"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"12–15 each side", color:"#b8a8d0" },
+  { title:"90-90 Hip Stretch", emoji:"🔄", body:"Sit on the floor beside the couch. Position both knees at 90°, one in front, one to the side. Hold each side with a long spine.", detail:"45–60 seconds each side. Targets both internal and external hip rotation — the ranges most restricted by sitting.", joints:["hips","knees","legs"], cats:["mobility"], couch:true, tools:[], sets:"45–60s each side", color:"#b8a8d0" },
+  { title:"Supine Hip Circles", emoji:"🌕", body:"Lie on your back, one knee drawn to chest. Slowly circle the knee in large circles — clockwise and counterclockwise. Full hip joint exploration.", detail:"5 circles each direction each hip. A gentle joint mobilization — the femoral head glides through the entire acetabulum. Excellent for hip stiffness.", joints:["hips","legs"], cats:["mobility","lymphatic"], couch:true, tools:[], sets:"5 each direction · each hip", color:"#b8a8d0" },
+
+  // ── COUCH · KNEES ───────────────────────────────────────────
+  { title:"Seated Knee Extension Hold", emoji:"🦵", body:"Loop around both ankles. Seated, extend one knee out straight against the loop's resistance. Hold 3–5 seconds. Strengthens the quad in its terminal range.", detail:"10 reps each leg. Terminal knee extension trains the range most important for locking the knee safely during walking. Core knee rehab exercise.", joints:["knees","legs"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"10 each leg · hold 3–5s", color:"#b8d0a8" },
+  { title:"Knee Marching", emoji:"🚶", body:"Seated, slowly alternate lifting each knee upward as if marching in slow motion. Activates hip flexors and pumps lymph through the thighs.", detail:"10–12 per side. Lift, hold 1–2 seconds, lower slowly.", joints:["hips","knees","legs"], cats:["lymphatic","strengthen"], couch:true, tools:[], sets:"10–12 per leg", color:"#b8d0a8" },
+  { title:"Seated Quad Set", emoji:"🧲", body:"Seated, leg extended. Press the back of your knee down toward the seat and tighten the quad. Hold 5 seconds. Isometric VMO activation.", detail:"10 reps each leg. One of the first exercises prescribed after knee surgery — trains the inner quad to fire without any joint motion.", joints:["knees","legs"], cats:["strengthen"], couch:true, tools:[], sets:"10 reps each leg · 5s hold", color:"#b8d0a8" },
+  { title:"Hamstring Curl with Strap", emoji:"🎗️", body:"Sit toward the front of the couch. Loop strap around one ankle, anchor behind you at low height. Curl the heel back against the resistance.", detail:"10–12 reps each leg. The hamstring's job is to flex the knee and extend the hip — this trains the knee-flexion function directly.", joints:["knees","legs"], cats:["strengthen"], couch:true, tools:["resistance straps"], sets:"10–12 each leg", color:"#b8d0a8" },
+
+  // ── COUCH · LEGS ────────────────────────────────────────────
+  { title:"Seated Calf Raises", emoji:"🔼", body:"Seated, feet flat. Slowly rise onto the balls of your feet, hold 2 seconds, lower. Both together, then single-leg.", detail:"15–20 reps. The slow lowering phase is the most important — control it for 3–4 seconds. Builds calf and Achilles tendon resilience.", joints:["ankles","knees","legs"], cats:["strengthen","lymphatic"], couch:true, tools:[], sets:"15–20 reps · both then single" , color:"#b8d0a8" },
+  { title:"Supine Leg Pumps", emoji:"💧", body:"Lie on your back, legs extended up the couch back or wall. Alternately flex and extend feet. Gravity-assisted lymph drain plus ankle pump.", detail:"30–60 pumps. The elevated legs mean gravity assists lymph drainage while the pump action adds an active component. Best of both approaches.", joints:["ankles","legs"], cats:["lymphatic"], couch:true, tools:[], sets:"30–60 pumps", color:"#b8d0a8" },
+  { title:"Legs Up the Couch Back", emoji:"🧘", body:"Lie on the floor with your legs resting vertically up the back of the couch. Gravity reverses the flow — one of the most effective passive lymphatic drainage positions.", detail:"5–15 minutes. A simplified Viparita Karani. Drains lower leg lymph and venous blood passively — no effort required.", joints:["ankles","knees","hips","legs"], cats:["lymphatic","mindfulness"], couch:true, tools:[], sets:"5–15 minutes", color:"#b8a8d0" },
+  { title:"Inner Thigh Squeeze", emoji:"🦵", body:"Seated, place a pillow between your knees. Squeeze your knees together against the pillow, hold 5 seconds. Strengthens the hip adductors.", detail:"10–12 reps. Hip adductors stabilize the pelvis during walking — weakness here contributes to knee valgus and hip pain.", joints:["hips","knees","legs"], cats:["strengthen"], couch:true, tools:[], sets:"10–12 reps · 5s hold", color:"#b8d0a8" },
+  { title:"Reclined Hamstring Stretch", emoji:"🌿", body:"Lie on your back, loop a strap around one foot, hold both ends. Gently straighten the leg toward the ceiling. Hold, breathe, switch.", detail:"Hold 30–60 seconds each side. The strap lets you go as far as comfortable without strain. Hamstring length directly affects low back comfort.", joints:["knees","hips","legs"], cats:["mobility","flossing"], couch:true, tools:["resistance straps"], sets:"30–60s each leg", color:"#b8d0a8" },
+
+  // ── COUCH · CORE ────────────────────────────────────────────
+  { title:"Diaphragmatic Belly Breath", emoji:"🌬️", body:"One hand on chest, one on belly. Breathe so only the belly hand rises. The diaphragm is the body's primary lymphatic pump.", detail:"10 slow breaths. The cisterna chyli just below the diaphragm is massaged with every full belly breath. Foundation of lymphatic drainage.", joints:["core"], cats:["lymphatic","mindfulness"], couch:true, tools:[], sets:"10 breaths · 1–3 rounds", color:"#a8d0c8" },
+  { title:"Seated Spinal Lengthening", emoji:"🌲", body:"Sit at couch edge. Inhale and grow tall through the crown of your head. Exhale and maintain the height. Decompresses the spine and resets posture.", detail:"5–8 slow breaths. Pair with a gentle chin tuck to create full spinal traction. Foundation of all sitting posture work.", joints:["core","shoulders"], cats:["mindfulness"], couch:true, tools:[], sets:"5–8 breaths", color:"#c8b8d8" },
+  { title:"Seated Dead Bug Arms", emoji:"🐞", body:"Seated upright, arms extended in front at shoulder height. Slowly lower one arm behind you while maintaining posture. Core resists the backward pull.", detail:"8 reps each arm. The seated version of the dead bug pattern — trains the deep core anti-extension without lying down.", joints:["core","shoulders"], cats:["strengthen"], couch:true, tools:[], sets:"8 each arm · slow", color:"#c8b8d8" },
+  { title:"Loop Pallof Press — Seated", emoji:"🧲", body:"Anchor loop at chest height to a couch leg or door. Sit sideways, hold loop at chest, press straight out and return. Anti-rotation core strength.", detail:"8–10 reps each side. The resistance wants to rotate your spine — the core's job is to resist. Trains the obliques and deep stabilizers.", joints:["core","shoulders"], cats:["strengthen"], couch:true, tools:["resistance loops"], sets:"8–10 each side", color:"#c8b8d8" },
+  { title:"Box Breath + Joint Scan", emoji:"🧘", body:"Inhale 4 counts, hold 4, exhale 4, hold 4. With each cycle bring soft attention to one joint — ankles, knees, hips, wrists, shoulders.", detail:"1 breath cycle per joint or more. Somatic body scan combined with box breathing — down-regulates the nervous system and reduces muscle guarding around joints.", joints:["ankles","wrists","shoulders","knees","hips","core"], cats:["mindfulness"], couch:true, tools:[], sets:"5–10 minutes", color:"#c8b8d8" },
+  { title:"Seated Oblique Reach", emoji:"🌊", body:"Sit tall, one arm overhead. Slowly side-bend away from the raised arm, reaching the top hand further. Return. Lateral core lengthening and strengthening.", detail:"8 reps each side. This trains the quadratus lumborum — the most important lateral trunk stabilizer. Keep both sitting bones on the couch throughout.", joints:["core","shoulders"], cats:["strengthen","mobility"], couch:true, tools:[], sets:"8 each side · slow", color:"#c8b8d8" },
+
+  // ── RESTORATIVE / SUPPORTED ─────────────────────────────────
+  { title:"Supported Butterfly", emoji:"🦋", body:"Soles of feet together, knees falling open. Place couch cushions under each knee. Let gravity open the hips passively — no pressing.", detail:"2–5 minutes. Yin approach: long passive holds release the hip capsule and connective tissue rather than just the muscles.", joints:["hips","knees","legs"], cats:["mobility","mindfulness"], couch:true, tools:["yoga support pillows"], sets:"2–5 minutes", color:"#b8a8d0" },
+  { title:"Pillow-Supported Knee Prop", emoji:"🛋️", body:"Lie on your back, couch cushion or pillow under both knees. Decompresses the lower back and passively releases the psoas and hip flexors.", detail:"5–10 minutes. Add belly breathing here for an abdominal lymph pump. The psoas attaches to the lumbar spine — chronic tightness affects both the hip and back.", joints:["hips","knees","legs","core"], cats:["mindfulness","lymphatic"], couch:true, tools:["yoga support pillows"], sets:"5–10 minutes", color:"#b8a8d0" },
+  { title:"Reclined Spinal Twist", emoji:"🌿", body:"Lie on your back on the couch or floor. Draw one knee to chest and let it fall across the body. Extend the same arm out. Breathe into the rotation.", detail:"Hold 1–2 minutes each side. Releases the thoracolumbar fascia, decompresses lumbar spinal joints, and gently stimulates the abdominal organs.", joints:["hips","shoulders","core","legs"], cats:["mobility","flossing"], couch:true, tools:[], sets:"1–2 mins each side", color:"#b8a8d0" },
+
+  // ── STANDING / FLOOR (not couch) ────────────────────────────
+  { title:"Gentle Bounce", emoji:"🪃", body:"Stand on the trampoline and gently spring — feet may not leave the surface. One of the most efficient lymphatic drainage tools you own.", detail:"3–5 minutes. The health bounce activates the lymphatic system throughout the body via repeated G-force changes.", joints:["ankles","knees","hips","legs"], cats:["lymphatic"], couch:false, tools:["trampoline"], sets:"3–5 mins · gentle", color:"#c8c0a8" },
+  { title:"IT Band & Thigh Roll", emoji:"🪵", body:"Roller under one thigh on the floor. Use arms to shift weight slowly from hip to just above the knee.", detail:"1–2 minutes per leg. Pause on dense spots and breathe 3–5 times before moving on.", joints:["hips","knees","legs"], cats:["flossing","lymphatic"], couch:false, tools:["foam roller"], sets:"1–2 mins each leg", color:"#b8d0a8" },
+  { title:"Thoracic Extension on Roller", emoji:"🌅", body:"Roller placed horizontally across your mid-back on the floor. Support your head and let your chest open toward the ceiling.", detail:"Work up 1–2 inches at a time, from mid to upper back. 2–3 minutes. Most effective single exercise for rounded shoulder posture.", joints:["shoulders","core"], cats:["flossing","mobility"], couch:false, tools:["foam roller"], sets:"2–3 mins", color:"#a8b8c8" },
+  { title:"Glute Roll on Floor", emoji:"💺", body:"Sit on the roller on the floor, one ankle crossed over the opposite knee. Lean toward the crossed-leg side and slowly roll the glute.", detail:"30–60 seconds each side. The piriformis is deep in the glute — tight here contributes to hip and low back pain.", joints:["hips","legs"], cats:["flossing"], couch:false, tools:["foam roller"], sets:"30–60s each side", color:"#b8d0a8" },
+  { title:"Block-Supported Ankle Stretch", emoji:"🧱", body:"Kneel on the floor with a yoga block under your ankles. Gently sit back toward your heels. Opens the ankle joint — critical for knee and hip health.", detail:"1–2 minutes. Use a folded blanket or pillow if too intense on the knees.", joints:["ankles","knees","legs"], cats:["mobility","flossing"], couch:false, tools:["yoga blocks"], sets:"1–2 minutes", color:"#9ab89a" },
+  { title:"Supported Reclined Butterfly", emoji:"🌸", body:"Lie on the floor with a bolster supporting your spine lengthwise. Soles of feet together, arms open. Pure restorative — activates the parasympathetic nervous system.", detail:"5–15 minutes. Opens chest, shoulders, and hip adductors simultaneously while the supported backbend gently tractions the thoracic spine.", joints:["hips","shoulders","legs"], cats:["mindfulness","mobility"], couch:false, tools:["yoga support pillows"], sets:"5–15 minutes", color:"#d0b8c8" },
+  { title:"Bird Dog on Floor", emoji:"🐦", body:"On hands and knees, extend one arm and the opposite leg simultaneously. Hold 3 seconds. Core stability and hip extension in one movement.", detail:"8 reps each side. The goal is a still torso. Trains multifidus and transverse abdominis together — foundational core rehab exercise.", joints:["core","hips","shoulders","legs"], cats:["strengthen"], couch:false, tools:[], sets:"8 each side · 3s hold", color:"#c8b8d8" },
+  { title:"Dead Bug on Floor", emoji:"🐞", body:"Lie on back, arms up toward ceiling, knees at 90° in the air. Slowly lower one arm and the opposite leg toward the floor, return.", detail:"6–8 reps each side. Keep your low back pressed to the floor throughout. Foundational deep core anti-extension exercise.", joints:["core","hips","legs"], cats:["strengthen"], couch:false, tools:[], sets:"6–8 each side · slow", color:"#c8b8d8" }
+];
+
+// ═══ STATE ═══════════════════════════════════════════════════
+let currentMode = 'day';
+let selectedEquip = null;
+let activeJoint = 'all';
+let activeCat = 'all';
+let activeCouchFilter = 'all';
+
+// ═══ MODE ═══════════════════════════════════════════════════
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('day-panel').classList.toggle('visible', mode === 'day');
+  document.getElementById('eve-panel').classList.toggle('visible', mode === 'evening');
+  document.getElementById('day-btn').className = 'mode-btn' + (mode === 'day' ? ' active-day' : '');
+  document.getElementById('eve-btn').className = 'mode-btn' + (mode === 'evening' ? ' active-eve' : '');
+}
+
+// ═══ DAY MODE ═══════════════════════════════════════════════
+function selectEquip(btn) {
+  document.querySelectorAll('.equip-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedEquip = btn.dataset.equip;
+  showSnackCircuit(selectedEquip);
+}
+
+function showSnackCircuit(equipKey, shuffle) {
+  const all = dayMovements[equipKey] || [];
+  let moves = [...all];
+  if (shuffle) moves = moves.sort(() => Math.random() - 0.5);
+  moves = moves.slice(0, 5);
+
+  document.getElementById('day-placeholder').style.display = 'none';
+  const circuit = document.getElementById('snack-circuit');
+  circuit.style.display = 'block';
+
+  const labels = {
+    trampoline: 'Mini Trampoline Circuit',
+    dumbbells: 'Dumbbell Snack Circuit',
+    step: 'Step Circuit',
+    body: 'Bodyweight Circuit',
+    walls: 'Around the House Circuit',
+    roller: 'Foam Roller Circuit',
+    loops: 'Resistance Loop Circuit'
+  };
+  document.getElementById('snack-circuit-title').textContent = labels[equipKey] || 'Your Circuit';
+
+  const grid = document.getElementById('snack-grid');
+  grid.innerHTML = '';
+  moves.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = 'snack-card';
+    const jointTags = m.joints.map(j => `<span class="sc-tag">${j}</span>`).join('');
+    card.innerHTML = `
+      <div class="sc-number">Move ${i + 1} of ${moves.length}</div>
+      <div class="sc-title">${m.title} <span class="sc-emoji">${m.emoji}</span></div>
+      <div class="sc-body">${m.body}</div>
+      <div class="sc-tags">${jointTags}</div>
+      <div class="sc-meta">${m.sets}</div>
+      ${m.detail ? `<button class="expand-btn" onclick="toggleSnackDetail(this)">How to ↓</button><div class="card-detail">${m.detail}</div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function surpriseMe() {
+  const keys = Object.keys(dayMovements);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  // deselect all equip buttons
+  document.querySelectorAll('.equip-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.equip === randomKey);
+  });
+  selectedEquip = randomKey;
+  showSnackCircuit(randomKey, true);
+}
+
+function toggleSnackDetail(btn) {
+  const card = btn.closest('.snack-card');
+  const expanded = card.classList.toggle('expanded');
+  btn.textContent = expanded ? 'Less ↑' : 'How to ↓';
+}
+
+// ═══ EVENING MODE ═══════════════════════════════════════════
+function setCouchFilter(btn) {
+  activeCouchFilter = btn.dataset.value;
+  document.querySelectorAll('#couch-filters .cat-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.value === activeCouchFilter));
+  renderEveCards();
+}
+
+function setJoint(btn) {
+  activeJoint = btn.dataset.value;
+  document.querySelectorAll('#joint-filters .filter-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.value === activeJoint));
+  renderEveCards();
+}
+
+function setCat(btn) {
+  activeCat = btn.dataset.value;
+  document.querySelectorAll('#cat-filters .cat-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.value === activeCat));
+  renderEveCards();
+}
+
+function clearFilters() {
+  activeJoint = 'all'; activeCat = 'all'; activeCouchFilter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.value === 'all'));
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.value === 'all'));
+  renderEveCards();
+}
+
+function renderEveCards() {
+  const grid = document.getElementById('eve-grid');
+  const empty = document.getElementById('empty-state');
+  const countEl = document.getElementById('results-count');
+  grid.innerHTML = '';
+  const filtered = eveningMovements.filter(m => {
+    const jOk = activeJoint === 'all' || m.joints.includes(activeJoint);
+    const cOk = activeCat === 'all' || m.cats.includes(activeCat);
+    const coOk = activeCouchFilter === 'all' || m.couch === true;
+    return jOk && cOk && coOk;
+  });
+  filtered.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'eve-card';
+    card.style.setProperty('--card-color', m.color);
+    const jointTags = m.joints.map(j => `<span class="tag tag-joint">${j}</span>`).join('');
+    const catTags = m.cats.map(c => `<span class="tag tag-cat">${c}</span>`).join('');
+    const toolTags = m.tools.map(t => `<span class="tag tag-tool">${t}</span>`).join('');
+    const couchBadge = m.couch ? `<span class="tag" style="background:rgba(100,140,90,0.12);color:var(--sage);border:1px solid rgba(100,140,90,0.25)">🛋️ couch</span>` : `<span class="tag" style="background:rgba(150,130,100,0.1);color:var(--stone);border:1px solid rgba(150,130,100,0.2)">standing</span>`;
+    card.innerHTML = `
+      <div class="eve-card-top">
+        <div class="eve-card-title">${m.title}</div>
+        <div class="eve-card-emoji">${m.emoji}</div>
+      </div>
+      <div class="eve-card-body">${m.body}</div>
+      <div class="eve-card-tags">${couchBadge}${jointTags}${catTags}${toolTags}</div>
+      <div class="eve-card-sets">${m.sets}</div>
+      ${m.detail ? `<button class="eve-expand-btn" onclick="toggleEveDetail(this)">How to ↓</button><div class="eve-card-detail">${m.detail}</div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+  countEl.textContent = `${filtered.length} movement${filtered.length !== 1 ? 's' : ''}`;
+  empty.classList.toggle('visible', filtered.length === 0);
+}
+
+function eveningSnack() {
+  const shuffled = [...eveningMovements].sort(() => Math.random() - 0.5).slice(0, 5);
+  const resultsEl = document.getElementById('eve-snack-results');
+  const grid = document.getElementById('eve-snack-grid');
+  resultsEl.classList.add('visible');
+  grid.innerHTML = '';
+  shuffled.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = 'snack-card';
+    card.style.borderColor = 'rgba(125,155,118,0.2)';
+    card.style.setProperty('--day', 'var(--sage)');
+    const jointTags = m.joints.map(j => `<span class="sc-tag" style="background:rgba(125,155,118,0.1);color:var(--sage);border-color:rgba(125,155,118,0.25)">${j}</span>`).join('');
+    card.innerHTML = `
+      <div class="sc-number" style="color:var(--sage)">Move ${i+1} of ${shuffled.length}</div>
+      <div class="sc-title">${m.title} <span class="sc-emoji">${m.emoji}</span></div>
+      <div class="sc-body">${m.body}</div>
+      <div class="sc-tags">${jointTags}</div>
+      <div class="sc-meta">${m.sets}</div>
+      ${m.detail ? `<button class="expand-btn" style="color:var(--sage)" onclick="toggleSnackDetail(this)">How to ↓</button><div class="card-detail">${m.detail}</div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleEveDetail(btn) {
+  const card = btn.closest('.eve-card');
+  const expanded = card.classList.toggle('expanded');
+  btn.textContent = expanded ? 'Less ↑' : 'How to ↓';
+}
+
+// ═══ INIT ═══════════════════════════════════════════════════
+setMode('day');
+renderEveCards();
+</script>
+</body>
+</html>
